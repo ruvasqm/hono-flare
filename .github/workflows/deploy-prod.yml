@@ -1,0 +1,25 @@
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+jobs:
+  cleanup:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Delete db and destroy worker
+        uses: cloudflare/wrangler-action@v3
+        env:
+            PR_NUMBER: pr-${{ github.event.number }}
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          environment:  pr-${{ github.event.number }}
+          command: |
+            delete -e $PR_NUMBER
+            d1 delete "db-$PR_NUMBER" -y
+
