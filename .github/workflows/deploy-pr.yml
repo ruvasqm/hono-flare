@@ -24,11 +24,8 @@ jobs:
           preCommands: |
             SECTION="env.$PR_NUMBER"
             D1_SECTION="env.$PR_NUMBER.d1_databases"
-            grep -q "^\[$SECTION\]$" wrangler.toml || { 
-              echo "\n[$SECTION]" >> wrangler.toml 
-              echo "\nworkers_dev = true" >> wrangler.toml }
-            grep -q "^\[\[$D1_SECTION\]\]" wrangler.toml || { 
-              wrangler d1 create "db-$PR_NUMBER" | tail -n 5 | sed "s/^\\[\\[d1_databases\\]\\]/\\[\\[$D1_SECTION\\]\\]/" >> wrangler.toml }
+            grep -q "^\[$SECTION\]$" wrangler.toml || { echo "\n[$SECTION]" >> wrangler.toml;   echo "\nworkers_dev = true" >> wrangler.toml }
+            grep -q "^\[\[$D1_SECTION\]\]" wrangler.toml || { wrangler d1 create "db-$PR_NUMBER" | tail -n 5 | sed "s/^\\[\\[d1_databases\\]\\]/\\[\\[$D1_SECTION\\]\\]/" >> wrangler.toml }
             cat wrangler.toml
           postCommands: |
             wrangler d1 migrations apply DB -e="$PR_NUMBER" --remote
