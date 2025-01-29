@@ -22,9 +22,15 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           environment: pr-${{ github.event.number }}
           preCommands: |
-            echo "\n[env.$PR_NUMBER]" >> wrangler.toml 
-            echo "\nworkers_dev = true" >> wrangler.toml
-            wrangler d1 create "db-$PR_NUMBER" |  tail -n 5 | sed "s/^\\[\\[d1_databases\\]\\]/\\[\\[env.$PR_NUMBER.d1_databases\\]\\]/" >> wrangler.toml
+            SECTION="env.$PR_NUMBER"
+            D1_SECTION="env.$PR_NUMBER.d1_databases"
+            grep -q "^\[$SECTION\]$" wrangler.toml || {\
+              echo "\n[$SECTION]" >> wrangler.toml\
+              echo "\nworkers_dev = true" >> wrangler.toml\
+            }
+            grep -q "^\[\[$D1_SECTION\]\]" wrangler.toml || {\
+              wrangler d1 create "db-$PR_NUMBER" | tail -n 5 | sed "s/^\\[\\[d1_databases\\]\\]/\\[\\[$D1_SECTION\\]\\]/" >> wrangler.toml\
+            }
             cat wrangler.toml
           postCommands: |
             wrangler d1 migrations apply DB -e="$PR_NUMBER" --remote
