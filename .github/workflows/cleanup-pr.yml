@@ -20,5 +20,5 @@ jobs:
             PR_NUMBER: pr-${{ github.event.number }}
             CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
             CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      - run: bun install && PR_NUMBER=$PR_NUMBER sh .github/workflows/cleanup-pr-script.sh
+        run: bun install && PR_NUMBER=$PR_NUMBER sh .github/workflows/cleanup-pr-script.sh
         
