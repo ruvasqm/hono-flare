@@ -10,6 +10,9 @@ jobs:
     #needs: test
     steps:
       - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
       - name: Build & Deploy Worker
         uses: cloudflare/wrangler-action@v3
         env:
@@ -19,11 +22,9 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           environment: pr-${{ github.event.number }}
           preCommands: |
-            echo "\n[env.pr-$PR_NUMBER]" >> wrangler.toml 
-            echo "\nworkers_dev = true" >> wrangler.toml
-            wrangler d1 create "db-$PR_NUMBER" |  tail -n 5 | sed "s/^\\[\\[d1_databases\\]\\]/\\[\\[env.$PR_NUMBER.d1_databases\\]\\]/" >> wrangler.toml
+            PR_NUMBER="$PR_NUMBER" sh .github/workflows/deploy-pr-script.sh
           postCommands: |
-            wrangler d1 migrations apply -e="$pr-PR_NUMBER" --remote
+            PR_NUMBER="$PR_NUMBER" sh .github/workflows/deploy-pr-script-migrate-db.sh
   #test:
     # test job
 

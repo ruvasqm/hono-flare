@@ -1,26 +1,27 @@
-name: Cleanup PR
+name: Deploy Prod
 on:
-  pull_request:
-    branches:
-      - main
-    types:
-      - closed
-
+  push:
+    tags:
+      # using [semver](https://semver.org/)
+      - 'v[0-9]+.[0-9]+.[0-9]+'
 jobs:
-  cleanup:
-    if: github.event.pull_request.merged == true
+  deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+    #needs: test
     steps:
       - uses: actions/checkout@v4
-      - name: Delete db and destroy worker
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Build & Deploy Worker
         uses: cloudflare/wrangler-action@v3
-        env:
-            PR_NUMBER: pr-${{ github.event.number }}
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          environment:  pr-${{ github.event.number }}
-          command: |
-            delete -e $PR_NUMBER
-            d1 delete "db-$PR_NUMBER" -y
+          environment: production
+          postCommands: |
+            wrangler d1 migrations apply -e=production --remote
+    #test:
+    # test job
 
