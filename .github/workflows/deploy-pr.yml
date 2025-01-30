@@ -24,7 +24,7 @@ jobs:
           preCommands: |
             PR_NUMBER="$PR_NUMBER" sh .github/workflows/deploy-pr-script.sh
           postCommands: |
-            wrangler d1 migrations apply DB -e="$PR_NUMBER" --remote
+            PR_NUMBER="$PR_NUMBER" sh .github/workflows/deploy-pr-script-migrate-db.sh
   #test:
     # test job
 
