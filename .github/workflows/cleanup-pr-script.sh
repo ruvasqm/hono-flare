@@ -1,5 +1,5 @@
 #! /usr/bin/env sh
-DB_ID=$(bunx wrangler d1 list | sed -nE 's/^.*([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}).*db-pr-1.*/\1/p')
+DB_ID=$(bun run wrangler d1 list | sed -nE 's/^.*([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}).*db-pr-1.*/\1/p')
 grep -q "^\$DB_ID$" wrangler.toml || {
   {
     printf "\n[[env.%s.d1_databases]]" "$PR_NUMBER"
@@ -9,5 +9,5 @@ grep -q "^\$DB_ID$" wrangler.toml || {
   } >>wrangler.toml
 }
 
-bunx wrangler delete -e "$PR_NUMBER"
-bunx wrangler d1 delete "db-$PR_NUMBER" -y
+bun run wrangler delete -e "$PR_NUMBER"
+bun run wrangler d1 delete "db-$PR_NUMBER" -y
