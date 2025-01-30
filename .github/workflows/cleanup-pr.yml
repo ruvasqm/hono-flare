@@ -11,8 +11,9 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - name: Delete db and destroy worker
+      - name: Checkout
       - uses: actions/checkout@v4
+      - name: Delete db and destroy worker
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
