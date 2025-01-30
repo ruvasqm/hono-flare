@@ -9,4 +9,4 @@ grep -q "^\$DB_ID$" wrangler.toml || {
   } >>wrangler.toml
 }
 
-wrangler d1 migrations apply DB -e="$PR_NUMBER" --remote
+bunx wrangler d1 migrations apply DB -e="$PR_NUMBER" --remote
